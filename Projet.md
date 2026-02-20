@@ -211,3 +211,19 @@ sns.boxplot(data=current_smoker_df, x="Factor Value[Sample Type]", y=feature_col
 plt.title("Case vs Control (Current smokers)")
 plt.show()
 ```
+
+### 14) Vérification du désequilibre de classe
+
+Avant d’entraîner un modèle de classification, il est important de vérifier la distribution des classes afin d’identifier un éventuel déséquilibre pouvant influencer les performances du modèle.
+
+```python
+print(current_smoker_df["Factor Value[Sample Type]"].value_counts())
+
+sns.countplot(
+    data=current_smoker_df,
+    x="Factor Value[Sample Type]"
+)
+
+plt.title("Distribution des classes (Current smokers)")
+plt.show()
+```
