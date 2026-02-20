@@ -18,7 +18,7 @@ import matplotlib.pyplot as plt
 
 #### 2.1) Création du dossier de travail
 
-On copie des données du répertoire du cours vers notre espace de projet (equipe2bac) pour travailler localement sur le serveur.
+On copie des données du répertoire du cours vers notre espace de projet (equipe2bac) pour travailler localement sur le serveur. Cette étape permet d'éviter de modifier les données originales et garantit une meilleure reproductibilité du projet.
 
 
 ```python
@@ -39,7 +39,7 @@ path_to_metadata = "/project/def-sponsor00/projects/equipe2bac/MTBLS28_urinaryMe
 
 ### 3) Importation des données et métadonnées
 
-On lit les deux fichiers en donnant les chemins vers ceux-ci, grâce à la fonction read_csv de pandas (pd).
+On lit les deux fichiers en donnant les chemins vers ceux-ci, grâce à la fonction read_csv de pandas (pd). Cette séparation permet de traiter indépendamment les variables mesurées et les informations descriptives.
 
 
 ```python
@@ -49,6 +49,7 @@ metadata_df = pd.read_csv(path_to_metadata, sep=";")
 
 #### 3.1) Dimension des tableaux
 
+Cette vérification permet d'afficher le nombre d'échantillons et le nombre de variables.
 
 ```python
 print(metabolomic_df.shape)
@@ -73,6 +74,8 @@ metadata_df.head()
 
 ### 4) Vérification des données manquantes (NA)
 
+Une vérification des valeurs manquantes est effectuée pour évaluer la qualité des données.
+
 
 ```python
 print("Metabolomic NA :")
@@ -88,6 +91,7 @@ print(metadata_df.isnull().sum().sum())
 
 ### 5) Nombre d'échantillons uniques
 
+Le nombre d'échantillons uniques est calculé afin de vérifier qu'il n'existe pas de duplicats et que le nombre de participants est cohérents.
 
 ```python
 n_samples = metadata_df["Sample_Name"].nunique()
@@ -105,7 +109,7 @@ print(metabolomic_df.describe())
 
 ### 7) Filtre les données du dataframe metadata_df selon le statut "Case/Control"
 
-Cela nous donnera le nombre de particpant étant des 'Cas' et des 'Control'
+Les métadonnées sont filtrées afin de compter le nombre de participants appartenant aux groupes "Case" et "Control".
 
 
 ```python
@@ -120,7 +124,7 @@ print(case_metadata_df.head())
 
 ### 8) Fusion des dataframes
 
-On fusionne les deux tableaux sur une clé commune. Ainsi, nous renommons dans metabolomic_df la colonne Unnamed:0 par Sample_ID et dans metadata_df, la colonne Sample_Name devient Sample_ID. Puis on fusionne ces tableaux sur cette clé.
+Les deux tableaux sont fusionés sur une clé commune. Ainsi, nous renommons dans metabolomic_df la colonne Unnamed:0 par Sample_ID et dans metadata_df, la colonne Sample_Name devient Sample_ID. Puis on fusionne ces tableaux sur cette clé.
 
 
 ```python
@@ -134,6 +138,7 @@ combined_df.head()
 
 ### 9) Exploration de la variable "Smoking"
 
+La variable "Smoking" est explorée pour identifier les différentes catégories disponibles. 
 
 ```python
 print(combined_df["Factor Value[Smoking]"].value_counts(dropna=False))
@@ -143,6 +148,7 @@ print(combined_df["Factor Value[Smoking]"].unique()[:20])
 
 ### 10) Filtrage - Current Smoker
 
+Le DataFrame est filtré pour conserver uniquement les participants « Current Smoker ». Ce filtrage réduit le jeu de données au sous-groupe pertinent pour l’analyse.
 
 ```python
 current_smoker_df = combined_df[
@@ -159,6 +165,7 @@ current_smoker_df.head()
 
 #### 10.1) Conserver uniquement Case vs Control
 
+Un second filtrage est appliqué pour conserver uniquement les individus appartenant aux classes « Case » et « Control », afin de préparer une classification binaire.
 
 ```python
 current_smoker_df = current_smoker_df[
@@ -170,6 +177,7 @@ print(current_smoker_df["Factor Value[Sample Type]"].value_counts())
 
 ### 11) Création de la variable cicle (label)
 
+Une nouvelle variable numérique est créée en convertissant les classes textuelles en valeurs numériques (Case = 1 et Control = 0).
 
 ```python
 current_smoker_df["Label"] = current_smoker_df["Factor Value[Sample Type]"].map({
@@ -182,6 +190,7 @@ print(current_smoker_df["Label"].value_counts())
 
 ### 12) Matrice de features X et vecteur cible y
 
+Les colonnes métabolomiques sont sélectionnées pour constituer la matrice de features X, tandis que le label binaire représente la variable cible y.
 
 ```python
 feature_cols = [c for c in metabolomic_df.columns if c != "SampleID"]
