@@ -146,21 +146,21 @@ print("\nValeurs uniques (top 20):")
 print(combined_df["Factor Value[Smoking]"].unique()[:20])
 ```
 
-### 10) Filtrage - Current Smoker
+### 10) Filtrage - Former Smoker
 
-Le DataFrame est filtré pour conserver uniquement les participants « Current Smoker ». Ce filtrage réduit le jeu de données au sous-groupe pertinent pour l’analyse.
+Le DataFrame est filtré pour conserver uniquement les participants « Former Smoker ». Ce filtrage réduit le jeu de données au sous-groupe pertinent pour l’analyse.
 
 ```python
-current_smoker_df = combined_df[
+former_smoker_df = combined_df[
     combined_df["Factor Value[Smoking]"]
     .astype(str)
     .str.strip()
     .str.lower()
-    .str.contains("current")
+    .str.contains("former")
 ].copy()
 
-print(current_smoker_df.shape)
-current_smoker_df.head()
+print(former_smoker_df.shape)
+former_smoker_df.head()
 ```
 
 #### 10.1) Conserver uniquement Case vs Control
@@ -168,11 +168,11 @@ current_smoker_df.head()
 Un second filtrage est appliqué pour conserver uniquement les individus appartenant aux classes « Case » et « Control », afin de préparer une classification binaire.
 
 ```python
-current_smoker_df = current_smoker_df[
-    current_smoker_df["Factor Value[Sample Type]"].isin(["Case", "Control"])
+former_smoker_df = former_smoker_df[
+    former_smoker_df["Factor Value[Sample Type]"].isin(["Case", "Control"])
 ].copy()
 
-print(current_smoker_df["Factor Value[Sample Type]"].value_counts())
+print(former_smoker_df["Factor Value[Sample Type]"].value_counts())
 ```
 
 ### 11) Création de la variable cicle (label)
@@ -180,12 +180,12 @@ print(current_smoker_df["Factor Value[Sample Type]"].value_counts())
 Une nouvelle variable numérique est créée en convertissant les classes textuelles en valeurs numériques (Case = 1 et Control = 0).
 
 ```python
-current_smoker_df["Label"] = current_smoker_df["Factor Value[Sample Type]"].map({
+former_smoker_df["Label"] = former_smoker_df["Factor Value[Sample Type]"].map({
     "Case": 1,
     "Control": 0
 })
 
-print(current_smoker_df["Label"].value_counts())
+print(former_smoker_df["Label"].value_counts())
 ```
 
 ### 12) Matrice de features X et vecteur cible y
@@ -195,8 +195,8 @@ Les colonnes métabolomiques sont sélectionnées pour constituer la matrice de 
 ```python
 feature_cols = [c for c in metabolomic_df.columns if c != "SampleID"]
 
-X = current_smoker_df[feature_cols].apply(pd.to_numeric, errors="coerce")
-y = current_smoker_df["Label"].astype(int)
+X = former_smoker_df[feature_cols].apply(pd.to_numeric, errors="coerce")
+y = former_smoker_df["Label"].astype(int)
 
 print(X.shape, y.shape)
 ```
@@ -207,8 +207,8 @@ print(X.shape, y.shape)
 
 
 ```python
-sns.histplot(data=current_smoker_df, x=feature_cols[0])
-plt.title("Histogramme d'un métabolite (Current smokers)")
+sns.histplot(data=former_smoker_df, x=feature_cols[0])
+plt.title("Histogramme d'un métabolite (Former smokers)")
 plt.show()
 ```
 
@@ -216,8 +216,8 @@ plt.show()
 
 
 ```python
-sns.boxplot(data=current_smoker_df, x="Factor Value[Sample Type]", y=feature_cols[0])
-plt.title("Case vs Control (Current smokers)")
+sns.boxplot(data=former_smoker_df, x="Factor Value[Sample Type]", y=feature_cols[0])
+plt.title("Case vs Control (Former smokers)")
 plt.show()
 ```
 
@@ -226,13 +226,13 @@ plt.show()
 Avant d’entraîner un modèle de classification, il est important de vérifier la distribution des classes afin d’identifier un éventuel déséquilibre pouvant influencer les performances du modèle.
 
 ```python
-print(current_smoker_df["Factor Value[Sample Type]"].value_counts())
+print(former_smoker_df["Factor Value[Sample Type]"].value_counts())
 
 sns.countplot(
-    data=current_smoker_df,
+    data=former_smoker_df,
     x="Factor Value[Sample Type]"
 )
 
-plt.title("Distribution des classes (Current smokers)")
+plt.title("Distribution des classes (Former smokers)")
 plt.show()
 ```
